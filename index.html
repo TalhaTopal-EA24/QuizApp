@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizApp</title>
+</head>
+<body>
+    <!-- Ekran 1: Anasayfa -->
+    <section id="screen-home">
+
+        <h1>QuizApp</h1>
+        <p>Bilgini test et, skorunu geliştir.</p>
+
+        <div id="last-banner">
+            <div>
+                <div id="ib-name"></div>
+                <div id="lb-meta"></div>
+            </div>
+            <div>
+                <div id="lb-score">0</div>
+                <div>son skor</div>
+            </div>
+        </div>
+
+        <label>İsmin</label>
+        <input type="text" id="inp-name" placeholder="Adını gir..." maxlength="20" />
+    
+        <label>Kategori</label>
+        <div id="pills-cat">
+            <button data-val="Teknoloji">⚡ Teknoloji</button>
+            <button data-val="Bilim">🔬 Bilim</button>
+            <button data-val="Tarih">🏛️ Tarih</button>
+            <button data-val="Matematik">∑ Matematik</button>
+        </div>
+
+        <label>Zorluk</label>
+        <div id="pills-diff">
+            <button data-val="Kolay"></button>
+            <button data-val="Orta"></button>
+            <button data-val="Zor"></button>
+        </div>
+        
+        <label>Soru Sayısı</label>
+        <div id="pills-count">
+            <button data-val="5">5</button>
+            <button data-val="10">10</button>
+            <button data-val="15">15</button>
+            <button data-val="20">20</button>
+        </div>
+    
+        <button id="btn-start">Başla →</button>
+        <button id="btn-hist">📋 Geçmiş Quizler</button>
+    </section>
+
+    <!-- Ekran 2: Quiz -->
+    <section id="screen-quiz">
+        <div>
+            <button id="btn-exit">✕ Çıkış</button>
+            <span id="q-counter">1 / 10</span>
+            <span id="q-score">0 puan</span>
+        </div>
+
+        <div>
+            <div id="prog-fill" style="width:0%"></div>
+        </div>
+
+        <div>
+            <div id="timer-fill"></div>
+            <span id="timer-num">20</span>
+        </div>
+
+        <div>
+            <h2 class="q-test"></h2>
+        </div>
+
+        <div id="answers"></div>
+
+    </section>
+
+    <!-- Ekran 3: Sonuç -->
+
+    <section id="screen-result">
+        <div id="res-emoji">🎉</div>
+        <div id="res-score">0</div>
+        <div>puan</div>
+        <h2 id="res-title">Tamamlandı!</h2>
+    
+        <div>
+            <div>
+                <span id="res-correct">0</span>
+                <span>Doğru</span>
+            </div>
+        </div>
+        <div>
+            <span id="res-wrong">0</span>
+            <span>Yanlış</span>
+        </div>
+        <div>
+            <span id="res-acc">0%</span>
+            <span>Doğruluk</span>
+        </div>
+        </div>
+        <button id="btn-again">↩ Tekrar</button>
+        <button id="btn-home">Ana Sayfa</button>
+    </section>
+
+    <!-- Ekran 4: Geçmiş -->
+
+    <section id="screen-history">
+
+        <h2>Geçmiş Quizler</h2>
+        <button id="btn-hist-back">← Geri</button>
+
+        <div id="hist-list">
+            Henüz quiz yapılmadı.
+        </div>
+
+    </section>
+    
+</body>
+</html>
