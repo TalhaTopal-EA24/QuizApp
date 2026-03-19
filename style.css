@@ -123,3 +123,4 @@ input[type="text"] {
 
 input[type="text"]:focus       { border-color: var(--accent); }
 input[type="text"]::placeholder { color: var(--muted); }
+
