@@ -123,6 +123,7 @@ function show(id) {
   document.getElementById(id).classList.add("active");
 }
 
+// Diziyi karıştır (Fisher-Yates)
 function shuffle(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -131,3 +132,69 @@ function shuffle(arr) {
   }
   return a;
 }
+
+// HTML injection'a karşı güvenlik
+function esc(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+// ── PILL SEÇİCİLER ────────────────────
+function setupPills(id, callback) {
+  document.getElementById(id).addEventListener("click", (e) => {
+    const pill = e.target.closest(".pill");
+    if (!pill) return;
+    document.querySelectorAll(`#${id} .pill`).forEach(p => p.classList.remove("on"));
+    pill.classList.add("on");
+    callback(pill.dataset.val);
+  });
+}
+ 
+setupPills("pills-cat",   (val) => { cfg.cat   = val; });
+setupPills("pills-diff",  (val) => { cfg.diff  = val; });
+setupPills("pills-count", (val) => { cfg.count = parseInt(val); });
+
+// ── SON QUİZ ÖZETİ ───────────────────
+function showLastBanner() {
+  const history = getHistory();
+  if (history.length === 0) return;
+ 
+  const last = history[0];
+  document.getElementById("last-banner").style.display = "flex";
+  document.getElementById("lb-name").textContent  = last.name;
+  document.getElementById("lb-meta").textContent  = `${last.cat} · ${last.diff} · ${last.date}`;
+  document.getElementById("lb-score").textContent = last.score;
+}
+showLastBanner();
+
+document.getElementById("btn-start").addEventListener("click", () => {
+  cfg.name = document.getElementById("inp-name").value.trim() || "Anonim";
+ 
+  const pool = BANK[cfg.cat]?.[cfg.diff] || [];
+  if (pool.length === 0) {
+    alert("Bu kombinasyon için soru bulunamadı!");
+    return;
+  }
+ 
+  // Soruları karıştır, seçilen sayı kadar al
+  quiz.questions = shuffle(pool).slice(0, Math.min(cfg.count, pool.length));
+  quiz.current   = 0;
+  quiz.score     = 0;
+  quiz.correct   = 0;
+  quiz.wrong     = 0;
+ 
+  show("screen-quiz");
+  loadQuestion();
+});
+
+
+document.getElementById("btn-exit").addEventListener("click", () => {
+  if (!confirm("Quiz'den çıkmak istediğine emin misin?")) return;
+  clearInterval(quiz.timerID);
+  show("screen-home");
+});
+ 
+
+
