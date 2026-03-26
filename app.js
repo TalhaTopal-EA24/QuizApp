@@ -189,12 +189,110 @@ document.getElementById("btn-start").addEventListener("click", () => {
   loadQuestion();
 });
 
-
+ // Çıkış butonu
 document.getElementById("btn-exit").addEventListener("click", () => {
   if (!confirm("Quiz'den çıkmak istediğine emin misin?")) return;
   clearInterval(quiz.timerID);
   show("screen-home");
 });
  
-
+// ── SORU YÜKLE ────────────────────────
+function loadQuestion() {
+  clearInterval(quiz.timerID);
+  quiz.answered = false;
+ 
+  const q     = quiz.questions[quiz.current];
+  const total = quiz.questions.length;
+ 
+  // Üst bilgileri güncelle
+  document.getElementById("q-counter").textContent = `${quiz.current + 1} / ${total}`;
+  document.getElementById("q-score").textContent   = `${quiz.score} puan`;
+  document.getElementById("prog-fill").style.width = `${(quiz.current / total) * 100}%`;
+  document.getElementById("q-text").textContent    = q.q;
+ 
+  // Cevap butonlarını oluştur
+  const letters = ["A", "B", "C", "D"];
+  document.getElementById("answers").innerHTML = q.opts
+    .map((opt, i) => `
+      <button class="ans-btn" onclick="pickAnswer(${i})">
+        <span class="ans-letter">${letters[i]}</span>${esc(opt)}
+      </button>
+    `)
+    .join("");
+ 
+  startTimer();
+}
+ 
+// ── CEVAP SEÇ ─────────────────────────
+function pickAnswer(chosen) {
+  if (quiz.answered) return;
+  quiz.answered = true;
+  clearInterval(quiz.timerID);
+ 
+  const q    = quiz.questions[quiz.current];
+  const btns = document.querySelectorAll(".ans-btn");
+  btns.forEach(btn => btn.disabled = true);
+ 
+  if (chosen === q.ans) {
+    // Doğru cevap
+    btns[chosen].classList.add("correct");
+    quiz.score  += 100 + Math.round((quiz.timerVal / TIMER) * 50); // zaman bonusu
+    quiz.correct++;
+  } else {
+    // Yanlış cevap
+    btns[chosen].classList.add("wrong");
+    btns[q.ans].classList.add("correct"); // doğruyu göster
+    quiz.wrong++;
+  }
+ 
+  document.getElementById("q-score").textContent = `${quiz.score} puan`;
+  setTimeout(nextQuestion, 1200);
+}
+ 
+function nextQuestion() {
+  quiz.current++;
+  if (quiz.current >= quiz.questions.length) {
+    endQuiz();
+  } else {
+    loadQuestion();
+  }
+}
+ 
+// ── ZAMANLAYICI ───────────────────────
+function startTimer() {
+  quiz.timerVal = TIMER;
+  updateTimerUI();
+ 
+  quiz.timerID = setInterval(() => {
+    quiz.timerVal--;
+    updateTimerUI();
+ 
+    if (quiz.timerVal < 0) {
+      clearInterval(quiz.timerID);
+      timeUp();
+    }
+  }, 1000);
+}
+ 
+function updateTimerUI() {
+  document.getElementById("timer-num").textContent  = quiz.timerVal;
+  document.getElementById("timer-fill").style.width = `${(quiz.timerVal / TIMER) * 100}%`;
+ 
+  const fill = document.getElementById("timer-fill");
+  fill.className = "timer-fill";
+  if (quiz.timerVal <= 5)       fill.classList.add("danger");
+  else if (quiz.timerVal <= 10) fill.classList.add("warn");
+}
+ 
+function timeUp() {
+  if (quiz.answered) return;
+  quiz.answered = true;
+ 
+  const btns = document.querySelectorAll(".ans-btn");
+  btns.forEach(btn => btn.disabled = true);
+  btns[quiz.questions[quiz.current].ans]?.classList.add("correct");
+  quiz.wrong++;
+ 
+  setTimeout(nextQuestion, 1200);
+}
 
