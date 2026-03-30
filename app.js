@@ -141,7 +141,7 @@ function esc(s) {
     .replace(/>/g, "&gt;");
 }
 
-// ── PILL SEÇİCİLER ────────────────────
+// ── PILL SEÇİCİLER ────
 function setupPills(id, callback) {
   document.getElementById(id).addEventListener("click", (e) => {
     const pill = e.target.closest(".pill");
@@ -156,7 +156,7 @@ setupPills("pills-cat",   (val) => { cfg.cat   = val; });
 setupPills("pills-diff",  (val) => { cfg.diff  = val; });
 setupPills("pills-count", (val) => { cfg.count = parseInt(val); });
 
-// ── SON QUİZ ÖZETİ ───────────────────
+// ── SON QUİZ ÖZETİ ────
 function showLastBanner() {
   const history = getHistory();
   if (history.length === 0) return;
@@ -196,7 +196,7 @@ document.getElementById("btn-exit").addEventListener("click", () => {
   show("screen-home");
 });
  
-// ── SORU YÜKLE ────────────────────────
+// ── SORU YÜKLE ─────
 function loadQuestion() {
   clearInterval(quiz.timerID);
   quiz.answered = false;
@@ -223,7 +223,7 @@ function loadQuestion() {
   startTimer();
 }
  
-// ── CEVAP SEÇ ─────────────────────────
+// ── CEVAP SEÇ ───
 function pickAnswer(chosen) {
   if (quiz.answered) return;
   quiz.answered = true;
@@ -258,7 +258,7 @@ function nextQuestion() {
   }
 }
  
-// ── ZAMANLAYICI ───────────────────────
+// ── ZAMANLAYICI ──
 function startTimer() {
   quiz.timerVal = TIMER;
   updateTimerUI();
@@ -296,3 +296,91 @@ function timeUp() {
   setTimeout(nextQuestion, 1200);
 }
 
+// ── QUİZ BİTİŞ ───
+function endQuiz() {
+  clearInterval(quiz.timerID);
+  document.getElementById("prog-fill").style.width = "100%";
+ 
+  const total    = quiz.questions.length;
+  const accuracy = total > 0 ? Math.round((quiz.correct / total) * 100) : 0;
+ 
+  // Sonuç metnini belirle
+  const tier   = Math.min(Math.floor(accuracy / 20), 4);
+  const emojis = ["😅", "🙂", "👍", "🎯", "🏆"];
+  const titles = ["Daha fazla pratik yap!", "Fena değil!", "İyi iş!", "Harika!", "Mükemmel!"];
+ 
+  document.getElementById("res-emoji").textContent   = emojis[tier];
+  document.getElementById("res-title").textContent   = titles[tier];
+  document.getElementById("res-score").textContent   = quiz.score;
+  document.getElementById("res-correct").textContent = quiz.correct;
+  document.getElementById("res-wrong").textContent   = quiz.wrong;
+  document.getElementById("res-acc").textContent     = accuracy + "%";
+ 
+  // localStorage'a kaydet
+  saveHistory({
+    name:    cfg.name,
+    cat:     cfg.cat,
+    diff:    cfg.diff,
+    score:   quiz.score,
+    correct: quiz.correct,
+    total:   total,
+    acc:     accuracy,
+    date:    new Date().toLocaleDateString("tr-TR"),
+  });
+ 
+  show("screen-result");
+}
+ 
+document.getElementById("btn-again").addEventListener("click", () => show("screen-home"));
+document.getElementById("btn-home").addEventListener("click", () => {
+  showLastBanner();
+  show("screen-home");
+});
+ 
+// ── GEÇMİŞ SONUÇLARI GÖRME ──
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(LS_KEY)) || [];
+  } catch {
+    return [];
+  }
+}
+ 
+function saveHistory(entry) {
+  const history = getHistory();
+  history.unshift(entry);                                        // en yeni başa
+  localStorage.setItem(LS_KEY, JSON.stringify(history.slice(0, 30))); // max 30
+}
+ 
+function renderHistory() {
+  const history = getHistory();
+  const list    = document.getElementById("hist-list");
+ 
+  if (history.length === 0) {
+    list.innerHTML = '<div class="empty">Henüz quiz yapılmadı. 🚀</div>';
+    return;
+  }
+ 
+  list.innerHTML = history
+    .map((entry, i) => `
+      <div class="hist-item" style="animation-delay: ${i * 0.04}s">
+        <div class="hi-left">
+          <div class="hi-name">${esc(entry.name)}</div>
+          <div class="hi-meta">${esc(entry.cat)} · ${esc(entry.diff)} · ${entry.correct}/${entry.total} · ${entry.date}</div>
+        </div>
+        <div class="hi-right">
+          <div class="hi-sc">${entry.score}</div>
+          <div class="hi-acc">%${entry.acc} doğruluk</div>
+        </div>
+      </div>
+    `)
+    .join("");
+}
+ 
+document.getElementById("btn-hist").addEventListener("click", () => {
+  renderHistory();
+  show("screen-history");
+});
+ 
+document.getElementById("btn-hist-back").addEventListener("click", () => show("screen-home"));
+ 
